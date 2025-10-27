@@ -1,0 +1,240 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom calendar styles */
+@layer components {
+  .calendar-container {
+    @apply w-full max-w-7xl mx-auto p-4;
+  }
+
+  .calendar-content {
+    @apply bg-white rounded-lg shadow-sm;
+  }
+
+  .appointment-form {
+    @apply w-full max-w-4xl mx-auto;
+  }
+
+  /* Custom scrollbar for appointment lists */
+  .appointment-list {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+
+  .appointment-list::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .appointment-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  .appointment-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  .appointment-list::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+
+  /* Animation for appointment cards */
+  .appointment-card {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  .appointment-card:hover {
+    @apply transform scale-105 shadow-lg;
+  }
+
+  /* Loading animation */
+  .loading-spinner {
+    @apply animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+  }
+
+  /* Status indicators */
+  .status-indicator {
+    @apply inline-flex items-center px-2 py-1 rounded-full text-xs font-medium;
+  }
+
+  .status-scheduled {
+    @apply bg-blue-100 text-blue-800;
+  }
+
+  .status-confirmed {
+    @apply bg-green-100 text-green-800;
+  }
+
+  .status-completed {
+    @apply bg-gray-100 text-gray-800;
+  }
+
+  .status-cancelled {
+    @apply bg-red-100 text-red-800;
+  }
+
+  .status-rescheduled {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+
+  /* Priority indicators */
+  .priority-indicator {
+    @apply w-2 h-2 rounded-full;
+  }
+
+  .priority-low {
+    @apply bg-green-500;
+  }
+
+  .priority-medium {
+    @apply bg-yellow-500;
+  }
+
+  .priority-high {
+    @apply bg-orange-500;
+  }
+
+  .priority-urgent {
+    @apply bg-red-500;
+  }
+
+  /* Calendar grid styles */
+  .calendar-grid {
+    @apply grid gap-px bg-gray-200 rounded-lg overflow-hidden;
+  }
+
+  .calendar-day {
+    @apply bg-white min-h-[120px] p-2 cursor-pointer transition-colors hover:bg-gray-50;
+  }
+
+  .calendar-day-other-month {
+    @apply bg-gray-50;
+  }
+
+  .calendar-day-today {
+    @apply bg-yellow-50;
+  }
+
+  .calendar-day-selected {
+    @apply bg-blue-50;
+  }
+
+  .calendar-day-weekend {
+    @apply bg-gray-50;
+  }
+
+  /* Form styles */
+  .form-group {
+    @apply space-y-1;
+  }
+
+  .form-label {
+    @apply block text-sm font-medium text-gray-700;
+  }
+
+  .form-input {
+    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .form-input-error {
+    @apply border-red-300 focus:border-red-500 focus:ring-red-500;
+  }
+
+  .form-textarea {
+    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .form-select {
+    @apply block w-full rounded-md border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .form-error {
+    @apply mt-1 text-sm text-red-600;
+  }
+
+  /* Button styles */
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
+  }
+
+  .btn-danger {
+    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+  }
+
+  .btn-ghost {
+    @apply text-gray-700 hover:bg-gray-100 focus:ring-gray-500;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+
+  .btn-md {
+    @apply px-4 py-2 text-sm;
+  }
+
+  .btn-lg {
+    @apply px-6 py-3 text-base;
+  }
+
+  /* Navigation styles */
+  .nav-button {
+    @apply inline-flex items-center justify-center rounded-md text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-white text-gray-900 hover:bg-gray-50 border border-gray-300;
+  }
+
+  .nav-button-disabled {
+    @apply bg-gray-100 text-gray-400 cursor-not-allowed;
+  }
+
+  /* Responsive utilities */
+  @media (max-width: 640px) {
+    .calendar-container {
+      @apply p-2;
+    }
+    
+    .calendar-day {
+      @apply min-h-[80px] p-1;
+    }
+    
+    .appointment-form {
+      @apply p-4;
+    }
+  }
+}
+
+/* Dark mode support (optional) */
+@media (prefers-color-scheme: dark) {
+  .calendar-container {
+    @apply bg-gray-900 text-white;
+  }
+  
+  .calendar-content {
+    @apply bg-gray-800 border-gray-700;
+  }
+  
+  .calendar-day {
+    @apply bg-gray-800 hover:bg-gray-700;
+  }
+  
+  .calendar-day-other-month {
+    @apply bg-gray-900;
+  }
+  
+  .form-input {
+    @apply bg-gray-800 border-gray-600 text-white placeholder:text-gray-400;
+  }
+  
+  .form-label {
+    @apply text-gray-300;
+  }
+}
