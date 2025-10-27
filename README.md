@@ -196,7 +196,7 @@ enum AppointmentPriority {
 ### Basic Usage
 
 ```tsx
-import { Calendar, mockAppointments } from '@your-org/calendar-module';
+import { Calendar, mockAppointments } from '@ijair/calendar-module';
 
 function BasicCalendar() {
   return (
@@ -215,7 +215,7 @@ function BasicCalendar() {
 ### With Event Handlers
 
 ```tsx
-import { Calendar, AppointmentForm } from '@your-org/calendar-module';
+import { Calendar, AppointmentForm } from '@ijair/calendar-module';
 
 function InteractiveCalendar() {
   const [appointments, setAppointments] = useState([]);
@@ -277,7 +277,7 @@ function InteractiveCalendar() {
 ### API Integration
 
 ```tsx
-import { Calendar, ApiResponse, Appointment } from '@your-org/calendar-module';
+import { Calendar, ApiResponse, Appointment } from '@ijair/calendar-module';
 
 function ApiIntegratedCalendar() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
@@ -392,7 +392,7 @@ npm run type-check
 The library includes mock data for testing and development:
 
 ```tsx
-import { mockAppointments, mockApiResponse } from '@your-org/calendar-module';
+import { mockAppointments, mockApiResponse } from '@ijair/calendar-module';
 
 // Use mock appointments
 const appointments = mockAppointments;
