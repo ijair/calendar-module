@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0] - 2024-10-27
+
+### Added
+- **Configurable enum values** - Support for custom statuses, priorities, and appointment types from database
+- **Moderation system** - Control who can change appointment status
+- **Role-based permissions** - Different access levels for patients, doctors, moderators, and admins
+- **UserRole enum** - PATIENT, DOCTOR, MODERATOR, ADMIN roles
+- **AppointmentEnumConfig interface** - Configuration for custom enum values
+- **ConfigurableOption interface** - Flexible option structure with labels, colors, and disabled states
+- **Moderation tracking** - Automatic tracking of who moderated each appointment
+- **Moderation notes** - Audit trail for status changes
+- **Helper functions** - `getConfigurableOptions()` and `canModifyStatus()` utilities
+- **Enhanced form validation** - Role-based field restrictions
+- **Advanced example** - Complete example showing configurable values and moderation
+
+### Changed
+- **Appointment interface** - Status, priority, and type fields now use strings for flexibility
+- **AppointmentFormData interface** - Updated to support string-based enum values
+- **CalendarConfig interface** - Added enumConfig, moderationEnabled, and currentUserRole options
+- **Form behavior** - Status field disabled for non-moderators when moderation is enabled
+- **Mock data** - Added moderation fields to sample appointments
+
+### Features
+- Custom statuses from database (e.g., 'pending_review', 'approved', 'rejected')
+- Custom priorities (e.g., 'high_priority', 'low_priority')
+- Custom appointment types (e.g., 'surgery', 'therapy', 'vaccination')
+- Visual indicators for moderated vs unmoderated appointments
+- Automatic moderation tracking when status changes
+- Role-based UI restrictions and permissions
+- Flexible configuration system for different healthcare workflows
+
 ## [1.0.0] - 2024-10-27
 
 ### Added

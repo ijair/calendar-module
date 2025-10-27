@@ -36,6 +36,36 @@ export enum AppointmentType {
 }
 
 /**
+ * User roles for appointment management
+ */
+export enum UserRole {
+  PATIENT = 'patient',
+  DOCTOR = 'doctor',
+  MODERATOR = 'moderator',
+  ADMIN = 'admin',
+}
+
+/**
+ * Configurable option interface for dropdowns
+ */
+export interface ConfigurableOption {
+  value: string;
+  label: string;
+  description?: string;
+  color?: string;
+  disabled?: boolean;
+}
+
+/**
+ * Configuration for appointment enums
+ */
+export interface AppointmentEnumConfig {
+  statuses: ConfigurableOption[];
+  priorities: ConfigurableOption[];
+  types: ConfigurableOption[];
+}
+
+/**
  * Core medical appointment interface
  */
 export interface Appointment {
@@ -44,9 +74,9 @@ export interface Appointment {
   description?: string;
   startTime: string; // ISO 8601 format
   endTime: string; // ISO 8601 format
-  status: AppointmentStatus;
-  priority: AppointmentPriority;
-  type: AppointmentType;
+  status: string; // Changed to string to support custom values
+  priority: string; // Changed to string to support custom values
+  type: string; // Changed to string to support custom values
   patientId?: string;
   patientName?: string;
   patientEmail?: string;
@@ -69,6 +99,12 @@ export interface Appointment {
   insuranceProvider?: string;
   insuranceNumber?: string;
   copay?: number;
+  // Moderation fields
+  isModerated?: boolean;
+  moderatedBy?: string; // User ID of moderator
+  moderatedAt?: string; // ISO 8601 format
+  moderationNotes?: string;
+  createdBy?: string; // User ID of creator
   createdAt: string; // ISO 8601 format
   updatedAt: string; // ISO 8601 format
   metadata?: Record<string, any>;
@@ -98,6 +134,12 @@ export interface CalendarConfig {
     days: number[]; // 0-6 (Sunday-Saturday)
   };
   timezone: string;
+  // Configurable enums
+  enumConfig?: AppointmentEnumConfig;
+  // Moderation settings
+  moderationEnabled?: boolean;
+  allowStatusChange?: boolean; // Only moderators can change status
+  currentUserRole?: UserRole;
 }
 
 /**
@@ -122,9 +164,9 @@ export interface AppointmentFormData {
   description?: string;
   startTime: string;
   endTime: string;
-  status: AppointmentStatus;
-  priority: AppointmentPriority;
-  type: AppointmentType;
+  status: string; // Changed to string to support custom values
+  priority: string; // Changed to string to support custom values
+  type: string; // Changed to string to support custom values
   patientName?: string;
   patientEmail?: string;
   patientPhone?: string;
@@ -145,6 +187,9 @@ export interface AppointmentFormData {
   insuranceProvider?: string;
   insuranceNumber?: string;
   copay?: number;
+  // Moderation fields
+  isModerated?: boolean;
+  moderationNotes?: string;
   metadata?: Record<string, any>;
 }
 
@@ -204,4 +249,59 @@ export const defaultTheme: CalendarTheme = {
     [AppointmentStatus.RESCHEDULED]: '#f59e0b',
     [AppointmentStatus.NO_SHOW]: '#f97316',
   },
+};
+
+/**
+ * Default configuration for appointment enums
+ */
+export const defaultEnumConfig: AppointmentEnumConfig = {
+  statuses: [
+    { value: AppointmentStatus.SCHEDULED, label: 'Scheduled', color: '#3b82f6' },
+    { value: AppointmentStatus.CONFIRMED, label: 'Confirmed', color: '#10b981' },
+    { value: AppointmentStatus.IN_PROGRESS, label: 'In Progress', color: '#8b5cf6' },
+    { value: AppointmentStatus.COMPLETED, label: 'Completed', color: '#6b7280' },
+    { value: AppointmentStatus.CANCELLED, label: 'Cancelled', color: '#ef4444' },
+    { value: AppointmentStatus.RESCHEDULED, label: 'Rescheduled', color: '#f59e0b' },
+    { value: AppointmentStatus.NO_SHOW, label: 'No Show', color: '#f97316' },
+  ],
+  priorities: [
+    { value: AppointmentPriority.ROUTINE, label: 'Routine', color: '#10b981' },
+    { value: AppointmentPriority.URGENT, label: 'Urgent', color: '#f59e0b' },
+    { value: AppointmentPriority.EMERGENCY, label: 'Emergency', color: '#ef4444' },
+    { value: AppointmentPriority.FOLLOW_UP, label: 'Follow-up', color: '#3b82f6' },
+  ],
+  types: [
+    { value: AppointmentType.CONSULTATION, label: 'Consultation' },
+    { value: AppointmentType.FOLLOW_UP, label: 'Follow-up' },
+    { value: AppointmentType.EMERGENCY, label: 'Emergency' },
+    { value: AppointmentType.TELEMEDICINE, label: 'Telemedicine' },
+    { value: AppointmentType.LAB_RESULTS, label: 'Lab Results' },
+    { value: AppointmentType.PRESCRIPTION_RENEWAL, label: 'Prescription Renewal' },
+    { value: AppointmentType.PREVENTIVE_CARE, label: 'Preventive Care' },
+    { value: AppointmentType.SPECIALIST_REFERRAL, label: 'Specialist Referral' },
+  ],
+};
+
+/**
+ * Helper function to get configurable options
+ */
+export const getConfigurableOptions = (
+  config: AppointmentEnumConfig | undefined,
+  type: 'statuses' | 'priorities' | 'types'
+): ConfigurableOption[] => {
+  if (config && config[type]) {
+    return config[type];
+  }
+  return defaultEnumConfig[type];
+};
+
+/**
+ * Helper function to check if user can modify appointment status
+ */
+export const canModifyStatus = (
+  userRole: UserRole | undefined,
+  moderationEnabled: boolean = false
+): boolean => {
+  if (!moderationEnabled) return true;
+  return userRole === UserRole.MODERATOR || userRole === UserRole.ADMIN;
 };

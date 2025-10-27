@@ -7,7 +7,11 @@ import {
   CalendarEventHandlers,
   AppointmentStatus,
   AppointmentPriority,
-  AppointmentType 
+  AppointmentType,
+  AppointmentEnumConfig,
+  UserRole,
+  getConfigurableOptions,
+  canModifyStatus
 } from '../types';
 import { 
   getMonthDates, 
@@ -37,6 +41,10 @@ export interface CalendarProps {
   className?: string;
   loading?: boolean;
   error?: string | null;
+  // Configuration props
+  enumConfig?: AppointmentEnumConfig;
+  moderationEnabled?: boolean;
+  currentUserRole?: UserRole;
 }
 
 /**
@@ -50,7 +58,15 @@ export const Calendar: React.FC<CalendarProps> = ({
   className,
   loading = false,
   error = null,
+  enumConfig,
+  moderationEnabled = false,
+  currentUserRole,
 }) => {
+  // Get configurable options
+  const statusOptions = getConfigurableOptions(enumConfig, 'statuses');
+  const priorityOptions = getConfigurableOptions(enumConfig, 'priorities');
+  const typeOptions = getConfigurableOptions(enumConfig, 'types');
+
   // Default configuration
   const defaultConfig: CalendarConfig = {
     view: CalendarView.MONTH,
@@ -63,6 +79,9 @@ export const Calendar: React.FC<CalendarProps> = ({
       days: [1, 2, 3, 4, 5], // Monday to Friday
     },
     timezone: 'UTC',
+    enumConfig,
+    moderationEnabled,
+    currentUserRole,
     ...config,
   };
 

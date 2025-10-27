@@ -5,7 +5,11 @@ import {
   AppointmentStatus, 
   AppointmentPriority,
   AppointmentType,
-  Appointment 
+  Appointment,
+  AppointmentEnumConfig,
+  UserRole,
+  getConfigurableOptions,
+  canModifyStatus
 } from '../types';
 import { cn, getInputClasses, getButtonClasses } from '../utils/classNames';
 
@@ -21,6 +25,11 @@ export interface AppointmentFormProps {
   defaultDate?: Date;
   defaultStartTime?: string;
   defaultEndTime?: string;
+  // Configuration props
+  enumConfig?: AppointmentEnumConfig;
+  moderationEnabled?: boolean;
+  currentUserRole?: UserRole;
+  allowStatusChange?: boolean;
 }
 
 /**
@@ -35,15 +44,27 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
   defaultDate = new Date(),
   defaultStartTime = '09:00',
   defaultEndTime = '10:00',
+  enumConfig,
+  moderationEnabled = false,
+  currentUserRole,
+  allowStatusChange = true,
 }) => {
+  // Get configurable options
+  const statusOptions = getConfigurableOptions(enumConfig, 'statuses');
+  const priorityOptions = getConfigurableOptions(enumConfig, 'priorities');
+  const typeOptions = getConfigurableOptions(enumConfig, 'types');
+  
+  // Check if user can modify status
+  const canModifyAppointmentStatus = canModifyStatus(currentUserRole, moderationEnabled) && allowStatusChange;
+
   const [formData, setFormData] = useState<AppointmentFormData>({
     title: '',
     description: '',
     startTime: '',
     endTime: '',
-    status: AppointmentStatus.SCHEDULED,
-    priority: AppointmentPriority.ROUTINE,
-    type: AppointmentType.CONSULTATION,
+    status: statusOptions[0]?.value || AppointmentStatus.SCHEDULED,
+    priority: priorityOptions[0]?.value || AppointmentPriority.ROUTINE,
+    type: typeOptions[0]?.value || AppointmentType.CONSULTATION,
     patientName: '',
     patientEmail: '',
     patientPhone: '',
@@ -355,18 +376,25 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
               <select
                 id="status"
                 value={formData.status}
-                onChange={(e) => handleInputChange('status', e.target.value as AppointmentStatus)}
+                onChange={(e) => handleInputChange('status', e.target.value)}
                 className={getInputClasses()}
-                disabled={loading}
+                disabled={loading || !canModifyAppointmentStatus}
               >
-                <option value={AppointmentStatus.SCHEDULED}>Scheduled</option>
-                <option value={AppointmentStatus.CONFIRMED}>Confirmed</option>
-                <option value={AppointmentStatus.IN_PROGRESS}>In Progress</option>
-                <option value={AppointmentStatus.COMPLETED}>Completed</option>
-                <option value={AppointmentStatus.CANCELLED}>Cancelled</option>
-                <option value={AppointmentStatus.RESCHEDULED}>Rescheduled</option>
-                <option value={AppointmentStatus.NO_SHOW}>No Show</option>
+                {statusOptions.map((option) => (
+                  <option 
+                    key={option.value} 
+                    value={option.value}
+                    disabled={option.disabled}
+                  >
+                    {option.label}
+                  </option>
+                ))}
               </select>
+              {moderationEnabled && !canModifyAppointmentStatus && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Only moderators can change appointment status
+                </p>
+              )}
             </div>
             
             <div>
@@ -376,14 +404,19 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
               <select
                 id="priority"
                 value={formData.priority}
-                onChange={(e) => handleInputChange('priority', e.target.value as AppointmentPriority)}
+                onChange={(e) => handleInputChange('priority', e.target.value)}
                 className={getInputClasses()}
                 disabled={loading}
               >
-                <option value={AppointmentPriority.ROUTINE}>Routine</option>
-                <option value={AppointmentPriority.URGENT}>Urgent</option>
-                <option value={AppointmentPriority.EMERGENCY}>Emergency</option>
-                <option value={AppointmentPriority.FOLLOW_UP}>Follow-up</option>
+                {priorityOptions.map((option) => (
+                  <option 
+                    key={option.value} 
+                    value={option.value}
+                    disabled={option.disabled}
+                  >
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
             
@@ -394,18 +427,19 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
               <select
                 id="type"
                 value={formData.type}
-                onChange={(e) => handleInputChange('type', e.target.value as AppointmentType)}
+                onChange={(e) => handleInputChange('type', e.target.value)}
                 className={getInputClasses()}
                 disabled={loading}
               >
-                <option value={AppointmentType.CONSULTATION}>Consultation</option>
-                <option value={AppointmentType.FOLLOW_UP}>Follow-up</option>
-                <option value={AppointmentType.EMERGENCY}>Emergency</option>
-                <option value={AppointmentType.TELEMEDICINE}>Telemedicine</option>
-                <option value={AppointmentType.LAB_RESULTS}>Lab Results</option>
-                <option value={AppointmentType.PRESCRIPTION_RENEWAL}>Prescription Renewal</option>
-                <option value={AppointmentType.PREVENTIVE_CARE}>Preventive Care</option>
-                <option value={AppointmentType.SPECIALIST_REFERRAL}>Specialist Referral</option>
+                {typeOptions.map((option) => (
+                  <option 
+                    key={option.value} 
+                    value={option.value}
+                    disabled={option.disabled}
+                  >
+                    {option.label}
+                  </option>
+                ))}
               </select>
             </div>
           </div>
@@ -694,6 +728,27 @@ export const AppointmentForm: React.FC<AppointmentFormProps> = ({
               )}
             </div>
           </div>
+
+          {/* Moderation Section */}
+          {moderationEnabled && canModifyAppointmentStatus && (
+            <div className="border-t pt-6">
+              <h4 className="text-md font-medium text-gray-900 mb-4">Moderation</h4>
+              <div>
+                <label htmlFor="moderationNotes" className="block text-sm font-medium text-gray-700 mb-1">
+                  Moderation Notes
+                </label>
+                <textarea
+                  id="moderationNotes"
+                  value={formData.moderationNotes || ''}
+                  onChange={(e) => handleInputChange('moderationNotes', e.target.value)}
+                  className={getInputClasses()}
+                  placeholder="Add notes about status changes or moderation decisions"
+                  rows={3}
+                  disabled={loading}
+                />
+              </div>
+            </div>
+          )}
 
           {/* Form Actions */}
           <div className="flex items-center justify-end space-x-3 pt-6 border-t">

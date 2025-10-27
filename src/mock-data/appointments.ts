@@ -35,8 +35,14 @@ export const mockAppointments: Appointment[] = [
     insuranceProvider: 'Seguro Popular',
     insuranceNumber: 'SP123456789',
     copay: 0,
+    // Moderation fields
+    isModerated: true,
+    moderatedBy: 'moderator-001',
+    moderatedAt: '2024-01-10T10:00:00Z',
+    moderationNotes: 'Appointment confirmed after patient verification',
+    createdBy: 'patient-001',
     createdAt: '2024-01-10T08:30:00Z',
-    updatedAt: '2024-01-10T08:30:00Z',
+    updatedAt: '2024-01-10T10:00:00Z',
     metadata: {
       department: 'Cardiology',
       referralSource: 'Emergency Room',
@@ -73,6 +79,9 @@ export const mockAppointments: Appointment[] = [
     insuranceProvider: 'IMSS',
     insuranceNumber: 'IMSS987654321',
     copay: 50,
+    // Moderation fields
+    isModerated: false,
+    createdBy: 'patient-002',
     createdAt: '2024-01-12T10:15:00Z',
     updatedAt: '2024-01-12T10:15:00Z',
     metadata: {

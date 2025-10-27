@@ -17,6 +17,9 @@ A reusable React calendar component library for managing medical appointments wi
 - 👨‍⚕️ Doctor and patient information management
 - 💊 Prescription and diagnosis tracking
 - 🔄 Follow-up appointment scheduling
+- ⚙️ **Configurable enum values** - Use your own statuses, priorities, and types from database
+- 🔒 **Moderation system** - Control who can change appointment status
+- 👥 **Role-based permissions** - Different access levels for patients, doctors, moderators
 
 ## Installation
 
@@ -191,6 +194,87 @@ enum AppointmentPriority {
 }
 ```
 
+## Advanced Features
+
+### Configurable Enum Values
+
+The library now supports custom enum values from your database. You can configure your own statuses, priorities, and appointment types:
+
+```tsx
+import { Calendar, AppointmentForm, AppointmentEnumConfig } from '@ijair/calendar-module';
+
+// Custom configuration from your database
+const customEnumConfig: AppointmentEnumConfig = {
+  statuses: [
+    { value: 'scheduled', label: 'Scheduled', color: '#3b82f6' },
+    { value: 'confirmed', label: 'Confirmed', color: '#10b981' },
+    { value: 'pending_review', label: 'Pending Review', color: '#fbbf24' },
+    { value: 'approved', label: 'Approved', color: '#059669' },
+    // Add your custom statuses here
+  ],
+  priorities: [
+    { value: 'routine', label: 'Routine', color: '#10b981' },
+    { value: 'urgent', label: 'Urgent', color: '#f59e0b' },
+    { value: 'high_priority', label: 'High Priority', color: '#dc2626' },
+    // Add your custom priorities here
+  ],
+  types: [
+    { value: 'consultation', label: 'Consultation' },
+    { value: 'surgery', label: 'Surgery' },
+    { value: 'therapy', label: 'Therapy Session' },
+    // Add your custom types here
+  ],
+};
+
+// Use in Calendar component
+<Calendar
+  appointments={appointments}
+  enumConfig={customEnumConfig}
+  // ... other props
+/>
+
+// Use in AppointmentForm component
+<AppointmentForm
+  enumConfig={customEnumConfig}
+  // ... other props
+/>
+```
+
+### Moderation System
+
+Control who can modify appointment status with the built-in moderation system:
+
+```tsx
+import { UserRole } from '@ijair/calendar-module';
+
+// Enable moderation system
+<Calendar
+  appointments={appointments}
+  moderationEnabled={true}
+  currentUserRole={UserRole.MODERATOR}
+  // ... other props
+/>
+
+<AppointmentForm
+  moderationEnabled={true}
+  currentUserRole={UserRole.MODERATOR}
+  allowStatusChange={true}
+  // ... other props
+/>
+```
+
+**User Roles:**
+- `PATIENT` - Can create appointments, cannot change status
+- `DOCTOR` - Can view and edit appointments, cannot change status
+- `MODERATOR` - Can change appointment status (secretary/assistant)
+- `ADMIN` - Full access to all features
+
+**Moderation Features:**
+- Only moderators can change appointment status
+- Automatic tracking of who moderated each appointment
+- Moderation notes for audit trail
+- Visual indicators for moderated vs unmoderated appointments
+
 ## Examples
 
 ### Basic Usage
@@ -208,6 +292,81 @@ function BasicCalendar() {
         timeFormat: '12h',
       }}
     />
+  );
+}
+```
+
+### Advanced Usage with Custom Configuration
+
+```tsx
+import { 
+  Calendar, 
+  AppointmentForm, 
+  AppointmentEnumConfig, 
+  UserRole,
+  mockAppointments 
+} from '@ijair/calendar-module';
+
+function AdvancedCalendar() {
+  const [appointments, setAppointments] = useState(mockAppointments);
+  const [currentUserRole, setCurrentUserRole] = useState(UserRole.MODERATOR);
+
+  // Custom enum configuration from your database
+  const customEnumConfig: AppointmentEnumConfig = {
+    statuses: [
+      { value: 'scheduled', label: 'Scheduled', color: '#3b82f6' },
+      { value: 'confirmed', label: 'Confirmed', color: '#10b981' },
+      { value: 'pending_review', label: 'Pending Review', color: '#fbbf24' },
+      { value: 'approved', label: 'Approved', color: '#059669' },
+      { value: 'rejected', label: 'Rejected', color: '#dc2626' },
+    ],
+    priorities: [
+      { value: 'routine', label: 'Routine', color: '#10b981' },
+      { value: 'urgent', label: 'Urgent', color: '#f59e0b' },
+      { value: 'high_priority', label: 'High Priority', color: '#dc2626' },
+    ],
+    types: [
+      { value: 'consultation', label: 'Consultation' },
+      { value: 'surgery', label: 'Surgery' },
+      { value: 'therapy', label: 'Therapy Session' },
+      { value: 'vaccination', label: 'Vaccination' },
+    ],
+  };
+
+  return (
+    <div>
+      {/* User Role Selector */}
+      <select 
+        value={currentUserRole} 
+        onChange={(e) => setCurrentUserRole(e.target.value as UserRole)}
+      >
+        <option value={UserRole.PATIENT}>Patient</option>
+        <option value={UserRole.DOCTOR}>Doctor</option>
+        <option value={UserRole.MODERATOR}>Moderator</option>
+        <option value={UserRole.ADMIN}>Admin</option>
+      </select>
+
+      {/* Calendar with custom configuration */}
+      <Calendar
+        appointments={appointments}
+        enumConfig={customEnumConfig}
+        moderationEnabled={true}
+        currentUserRole={currentUserRole}
+        eventHandlers={{
+          onAppointmentClick: (appointment) => console.log('Clicked:', appointment),
+          onDateClick: (date) => console.log('Date clicked:', date),
+        }}
+      />
+
+      {/* Form with custom configuration */}
+      <AppointmentForm
+        enumConfig={customEnumConfig}
+        moderationEnabled={true}
+        currentUserRole={currentUserRole}
+        onSubmit={(data) => console.log('Form submitted:', data)}
+        onCancel={() => console.log('Form cancelled')}
+      />
+    </div>
   );
 }
 ```
